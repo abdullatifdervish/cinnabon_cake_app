@@ -17,9 +17,9 @@ class LoginScreen extends StatelessWidget {
         children: [
           BackroundSection(screenWidth: screenWidth),
           Transform.translate(
-            offset: Offset(0, -50),
+            offset: Offset(0, -85),
             child: Container(
-              height: 390,
+              height: 325,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
@@ -32,7 +32,7 @@ class LoginScreen extends StatelessWidget {
                 children: [
                   Positioned.fill(
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 60, left: 45),
+                      padding: const EdgeInsets.only(top: 30, left: 45),
                       child: SingleChildScrollView(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,16 +51,19 @@ class LoginScreen extends StatelessWidget {
                               isPassword: true,
                             ),
                             Padding(
-                              padding: EdgeInsetsGeometry.symmetric(horizontal: screenWidth*0.30, vertical: 20),
+                              padding: EdgeInsetsGeometry.symmetric(horizontal: screenWidth*0.25, vertical: 20),
                               child: Row(
                                 children: [
                                   Image.asset("images/facebook.png"),
                                   SizedBox(width: 20),
-                                  Image.asset("images/google.png")
+                                  Image.asset("images/google.png"),
                                 ],
                               ),
                             ),
-                            Center(child: Text("or continue as Guest",)),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 80),
+                              child: Text("or continue as Guest",),
+                            ),
                             SizedBox(height: 20,),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -69,7 +72,9 @@ class LoginScreen extends StatelessWidget {
                                   color: Color(0xFF50CAD9),
                                   fontSize: 16
                                 ),),
-                                Text("Sign up", style: TextStyle(color: Color(0xFF50CAD9), fontSize: 16),)
+                                SizedBox(width: 30,),
+                                Text("Sign up", style: TextStyle(color: Color(0xFF50CAD9), fontSize: 16),),
+                                SizedBox(width: 10,)
                               ],
                             )
                           ],

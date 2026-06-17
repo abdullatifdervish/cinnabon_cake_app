@@ -1,3 +1,4 @@
+import 'package:cinnabon_cake_app/components/cart_item.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,6 +14,67 @@ class _HomeScreenState extends State<HomeScreen> {
   int selectedIndex = 0;
   int selectedType = 0;
   int text = 1;
+
+  final List<CartItem> cartItems = [];
+
+  int selectedQuantity = 1;
+  int selectedFlavor = 0;
+
+  void addToCart() {
+    final flavors = [
+      
+      {"name": "Lavanda Cream", "image": "images/cake2...png"},
+      {"name": "Gorgonzola and Pear", "image": "images/cake1..png"},
+      {"name": "Tea Rose", "image": "images/cake3...png"},
+    ];
+    final selected = flavors[selectedType];
+    final sizeLabel = ["70gr", "120gr", "180gr"][selectedIndex];
+    final fullDescription = "${selected['name']} $sizeLabel";
+
+    final existing = cartItems.where(
+      (item) => item.description == fullDescription, 
+    );
+
+    if (existing.isNotEmpty) {
+      // Varsa adedi artır
+      setState(() {
+        existing.first.quantity += selectedQuantity;
+      });
+    } else {
+      setState(() {
+        final List<double> prices = [2.50, 3.50, 4.50];
+        cartItems.add(
+          CartItem(
+            image: selected["image"]!,
+            name: "cinnabon",
+            description: fullDescription,
+            price: prices[selectedIndex],
+          ),
+        );
+      });
+    }
+    setState(() => selectedQuantity = 1);
+  }
+
+  void decreaseFromCart(int index) {
+    setState(() {
+      if (cartItems[index].quantity > 1) {
+        cartItems[index].quantity--;
+      } else {
+        cartItems.removeAt(index);
+      }
+    });
+  }
+
+  void increaseInCart(int index) {
+    setState(() => cartItems[index].quantity++);
+  }
+
+  double get totalPrice =>
+      cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
+
+  int get totalItems => cartItems.fold(0, (sum, item) => sum + item.quantity);
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -30,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Image.asset(
                 "images/Vector.png",
                 fit: BoxFit.cover,
-                height: 555,
+                height: 500,
               ),
             ),
             Positioned(
@@ -38,12 +100,12 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Image.asset(
                 "images/Vector2.png",
                 fit: BoxFit.cover,
-                height: 575,
+                //height: 575,
               ),
             ),
             Positioned(
               child: Padding(
-                padding: const EdgeInsets.only(top: 90, left: 70, right: 20),
+                padding: const EdgeInsets.only(top: 50, left: 70, right: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -68,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       "We have smth yummy for you",
                       style: TextStyle(color: Color(0xFFBD9D96)),
                     ),
-                    SizedBox(height: 70),
+                    SizedBox(height: 50),
                     Padding(
                       padding: const EdgeInsets.only(left: 30),
                       child: Column(
@@ -209,8 +271,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                                 Positioned(
-                                  bottom: 60,
-                                  right: 48,
+                                  top: -20,
+                                  bottom: 55,
+                                  right: 30,
                                   child: Column(
                                     children: [
                                       IconButton(
@@ -334,9 +397,11 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           child: GestureDetector(
                             onTap: () {
-                              setState(() {
-                                text == 1 ? text = 1 : text--;
-                              });
+                              if (selectedQuantity > 1) {
+                                setState(() {
+                                  selectedQuantity--;
+                                });
+                              }
                             },
                             child: Icon(
                               Icons.remove,
@@ -356,7 +421,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               borderRadius: BorderRadius.circular(50),
                             ),
                             child: Text(
-                              "$text",
+                              "$selectedQuantity",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -374,7 +439,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: GestureDetector(
                             onTap: () {
                               setState(() {
-                                text++;
+                                selectedQuantity++;
                               });
                             },
                             child: Icon(
@@ -386,6 +451,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         SizedBox(width: 60),
                         MaterialButton(
+                          onPressed: addToCart,
                           padding: EdgeInsets.symmetric(horizontal: 25),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(40),
@@ -395,7 +461,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             "Add To Cart",
                             style: TextStyle(color: Colors.white),
                           ),
-                          onPressed: () {},
                         ),
                       ],
                     ),
@@ -406,12 +471,14 @@ class _HomeScreenState extends State<HomeScreen> {
             DraggableScrollableSheet(
               initialChildSize: 0.10,
               minChildSize: 0.10,
-              maxChildSize: 0.6,
+              maxChildSize: 0.8,
               builder: (context, scrollController) {
                 return Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(40)),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(40),
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withValues(alpha: 0.1),
@@ -424,7 +491,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     controller: scrollController,
                     child: Column(
                       children: [
-                        const SizedBox(height: 12,),
+                        const SizedBox(height: 12),
                         Container(
                           width: 45,
                           height: 3,
@@ -432,14 +499,18 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: Colors.grey[300],
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          
                         ),
-                        Padding(
+                        if (cartItems.isEmpty)
+                          Padding(
                             padding: const EdgeInsets.symmetric(vertical: 15),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.shopping_bag_outlined, color: Colors.grey[600], size: 22),
+                                Icon(
+                                  Icons.shopping_bag_outlined,
+                                  color: Colors.grey[600],
+                                  size: 22,
+                                ),
                                 const SizedBox(width: 8),
                                 Text(
                                   "Cart is empty",
@@ -451,14 +522,143 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ],
                             ),
+                          )
+                        else
+                          Padding(
+                            padding: const EdgeInsets.only(left: 40),
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                left: 10,
+                                bottom: 30,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 10, right: 40),
+                                child: Text("Your Choice"),
+                              ),
+                            ),
                           ),
+
+                        ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: cartItems.length,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            final item = cartItems[index];
+
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 40),
+                              child: Row(
+                                children: [
+                                  Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      Positioned(
+                                        child: Image.asset(
+                                          "images/shadow_cart.png",
+                                          height: 75,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        right: 10,
+                                        top: -10,
+                                        child: Image.asset(item.image),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(width: 20),
+                                  SizedBox(
+                                    width: 100,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(item.name),
+                                        Text(item.description),
+                                        Text(item.price.toString()),
+                                      ],
+                                    ),
+                                  ),
+                                  Column(
+                                    children: [
+                                      Container(
+                                        height: 20,
+                                        width: 20,
+                                        decoration: BoxDecoration(
+                                          color: Color(0xFFCEB7B2),
+                                          borderRadius: BorderRadius.circular(
+                                            50,
+                                          ),
+                                        ),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              decreaseFromCart(index);
+                                            });
+                                          },
+                                          child: Icon(
+                                            Icons.remove,
+                                            color: Colors.white,
+                                            size: 17,
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          alignment: Alignment.center,
+                                          height: 35,
+                                          width: 35,
+                                          decoration: BoxDecoration(
+                                            color: Color(0xFFCEB7B2),
+                                            borderRadius: BorderRadius.circular(
+                                              50,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            "${item.quantity}",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        height: 20,
+                                        width: 20,
+                                        decoration: BoxDecoration(
+                                          color: Color(0xFFCEB7B2),
+                                          borderRadius: BorderRadius.circular(
+                                            50,
+                                          ),
+                                        ),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              increaseInCart(index);
+                                            });
+                                          },
+                                          child: Icon(
+                                            Icons.add,
+                                            color: Colors.white,
+                                            size: 17,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                        
                       ],
                     ),
                   ),
-
                 );
-              
-            },)
+              },
+            ),
           ],
         ),
       ),
